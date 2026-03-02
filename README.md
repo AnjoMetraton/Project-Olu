@@ -3,7 +3,7 @@ para oluolu
 
 
 # PT-BR
-Project Olu e um menu interativo de terminal escrito em Python que se comunica com a API do servidor via requisicoes HTTP. Ao iniciar, o usuario escolhe o idioma entre portugues, ingles e espanhol, depois realiza login com gmail e senha. Apos o login, o menu principal oferece seis funcoes.
+Project Olu é um menu interativo de terminal escrito em Python que se comunica com a API do servidor via requisicoes HTTP. Ao iniciar, o usuario escolhe o idioma entre portugues, ingles e espanhol, depois realiza login com gmail e senha. Apos o login, o menu principal oferece seis funcoes.
 A primeira permite entrar em uma call de qualquer chat ativo sem precisar de permissao. A segunda e a terceira permitem abrir e fechar calls em chats onde o usuario e co-admin. A quarta lista os seguidores do usuario e permite convidar um ou varios deles para um chat selecionado. A quinta transfere a administracao de um chat para outro usuario, sendo necessario ser admin do chat. A sexta busca e exibe informacoes de qualquer usuario pela sua Social ID, como nickname, contagem de seguidores, status e regiao. Basico por enquanto.
 
 ----------------------------------------------------------------------
