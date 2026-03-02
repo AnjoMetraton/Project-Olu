@@ -57,7 +57,6 @@ STRINGS = {
         "inviting": "[*] Convidando {} seguidor(es) para {}...",
         "invite_ok": "[+] {} seguidor(es) convidado(s) com sucesso!",
         "transfer_title": "Transferir Administracao",
-        "uid_input": "\nUID do novo administrador: ",
         "invalid_uid": "[!] UID invalido.",
         "transferring": "[*] Transferindo administracao de {} para UID {}...",
         "transfer_ok": "[+] Convite de administrador enviado com sucesso para UID {}!",
@@ -137,7 +136,6 @@ STRINGS = {
         "inviting": "[*] Inviting {} follower(s) to {}...",
         "invite_ok": "[+] {} follower(s) invited successfully!",
         "transfer_title": "Transfer Administration",
-        "uid_input": "\nUID of the new administrator: ",
         "invalid_uid": "[!] Invalid UID.",
         "transferring": "[*] Transferring admin of {} to UID {}...",
         "transfer_ok": "[+] Admin invite sent successfully to UID {}!",
@@ -217,7 +215,6 @@ STRINGS = {
         "inviting": "[*] Invitando {} seguidor(es) a {}...",
         "invite_ok": "[+] {} seguidor(es) invitado(s) con exito!",
         "transfer_title": "Transferir Administracion",
-        "uid_input": "\nUID del nuevo administrador: ",
         "invalid_uid": "[!] UID invalido.",
         "transferring": "[*] Transfiriendo administracion de {} al UID {}...",
         "transfer_ok": "[+] Invitacion de administrador enviada con exito al UID {}!",
@@ -499,9 +496,22 @@ def transferir_admin():
     if not chat:
         return
     tid = chat.get("thread_id")
-    uid = input(t("uid_input")).strip()
+    social_id = input(t("social_id_input")).strip().lstrip('@')
+    if not social_id:
+        print(t("invalid_social"))
+        input(t("press_enter"))
+        return
+    print(f"\n{t('searching', social_id)}")
+    status, data = req("/info-usuario", {"social_id": social_id})
+    if status != 200 or not data.get("success"):
+        print(f"{t('error')}{data.get('error') if data else t('no_response')}")
+        input(t("press_enter"))
+        return
+    u = data.get("data", {}).get("data", data.get("data", {}))
+    uid = str(u.get("uid", "")).strip()
     if not uid:
         print(t("invalid_uid"))
+        input(t("press_enter"))
         return
     print(f"\n{t('transferring', chat.get('title'), uid)}")
     status, data = req("/transferir-admin", {"thread_id": tid, "uid": uid})
