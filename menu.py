@@ -1,6 +1,7 @@
 import requests
 import sys
 import os
+from requests.exceptions import Timeout, ConnectionError as ReqConnError
 
 PELLA_URL = "https://olivinechimpanzee.onpella.app"
 
@@ -25,6 +26,7 @@ STRINGS = {
         "error": "[!] Erro: ",
         "no_response": "Sem resposta",
         "connection_error": "[!] Erro de conexao: ",
+        "timeout_error": "[!] Tempo de resposta esgotado. Tente novamente.",
         "available_chats": "\nChats disponiveis:\n",
         "cancel": "  [0] Cancelar",
         "select_chat": "\nSelecione o {}: ",
@@ -104,6 +106,7 @@ STRINGS = {
         "error": "[!] Error: ",
         "no_response": "No response",
         "connection_error": "[!] Connection error: ",
+        "timeout_error": "[!] Request timed out. Please try again.",
         "available_chats": "\nAvailable chats:\n",
         "cancel": "  [0] Cancel",
         "select_chat": "\nSelect the {}: ",
@@ -183,6 +186,7 @@ STRINGS = {
         "error": "[!] Error: ",
         "no_response": "Sin respuesta",
         "connection_error": "[!] Error de conexion: ",
+        "timeout_error": "[!] Tiempo de espera agotado. Intenta de nuevo.",
         "available_chats": "\nChats disponibles:\n",
         "cancel": "  [0] Cancelar",
         "select_chat": "\nSelecciona el {}: ",
@@ -278,8 +282,14 @@ def input_opcao(max_val):
 
 def req(endpoint, body=None):
     try:
-        r = s.post(f"{PELLA_URL}{endpoint}", json=body or {}, timeout=30)
+        r = s.post(f"{PELLA_URL}{endpoint}", json=body or {}, timeout=60)
         return r.status_code, r.json()
+    except Timeout:
+        print(t("timeout_error"))
+        return None, None
+    except ReqConnError as e:
+        print(f"{t('connection_error')}{e}")
+        return None, None
     except Exception as e:
         print(f"{t('connection_error')}{e}")
         return None, None
@@ -324,7 +334,8 @@ def login():
         input(t("press_enter"))
         return True
     else:
-        print(f"\n{t('error')}{data.get('error') if data else t('no_response')}")
+        if status is not None:
+            print(f"\n{t('error')}{data.get('error') if data else t('no_response')}")
         input(t("press_enter"))
         return False
 
@@ -356,14 +367,16 @@ def obter_chats_normais():
     status, data = req("/listar-chats")
     if status == 200 and isinstance(data, list):
         return data
-    print(f"{t('error_list_chats')}{data.get('error') if data else t('no_response')}")
+    if status is not None:
+        print(f"{t('error_list_chats')}{data.get('error') if data else t('no_response')}")
     return []
 
 def obter_chats_admin():
     status, data = req("/chats-admin")
     if status == 200 and isinstance(data, list):
         return data
-    print(f"{t('error_list_admin')}{data.get('error') if data else t('no_response')}")
+    if status is not None:
+        print(f"{t('error_list_admin')}{data.get('error') if data else t('no_response')}")
     return []
 
 def escolher_tipo_chat():
@@ -392,7 +405,7 @@ def entrar_call_sem_permissao():
     status, data = req("/entrar-na-call", {"thread_id": tid})
     if status == 200:
         print(t("enter_call_ok"))
-    else:
+    elif status is not None:
         print(f"{t('error')}{data.get('error') if data else t('no_response')}")
     input(t("press_enter"))
 
@@ -410,7 +423,7 @@ def abrir_call():
     status, data = req("/abrir-a-call", {"thread_id": tid})
     if status == 200 and data.get("success"):
         print(t("open_call_ok"))
-    else:
+    elif status is not None:
         print(f"{t('error')}{data.get('error') if data else t('no_response')}")
     input(t("press_enter"))
 
@@ -428,7 +441,7 @@ def fechar_call():
     status, data = req("/fechar-a-call", {"thread_id": tid})
     if status == 200 and data.get("success"):
         print(t("close_call_ok"))
-    else:
+    elif status is not None:
         print(f"{t('error')}{data.get('error') if data else t('no_response')}")
     input(t("press_enter"))
 
@@ -444,8 +457,9 @@ def convidar_seguidores():
     print(f"{t('selected_chat')}{chat.get('title')}")
     print(t("loading_followers"))
     status, data = req("/meus-seguidores", {})
-    if status != 200 or not data.get("success"):
-        print(f"{t('error_followers')}{data.get('error') if data else t('no_response')}")
+    if status != 200 or not data or not data.get("success"):
+        if status is not None:
+            print(f"{t('error_followers')}{data.get('error') if data else t('no_response')}")
         input(t("press_enter"))
         return
     seguidores = data.get("seguidores", [])
@@ -480,9 +494,9 @@ def convidar_seguidores():
         return
     print(f"\n{t('inviting', len(uids), chat.get('title'))}")
     status, data = req("/convidar-usuarios", {"thread_id": tid, "uids": uids})
-    if status == 200 and data.get("success"):
+    if status == 200 and data and data.get("success"):
         print(t("invite_ok", len(uids)))
-    else:
+    elif status is not None:
         print(f"{t('error')}{data.get('error') if data else t('no_response')}")
     input(t("press_enter"))
 
@@ -503,8 +517,9 @@ def transferir_admin():
         return
     print(f"\n{t('searching', social_id)}")
     status, data = req("/info-usuario", {"social_id": social_id})
-    if status != 200 or not data.get("success"):
-        print(f"{t('error')}{data.get('error') if data else t('no_response')}")
+    if status != 200 or not data or not data.get("success"):
+        if status is not None:
+            print(f"{t('error')}{data.get('error') if data else t('no_response')}")
         input(t("press_enter"))
         return
     u = data.get("data", {}).get("data", data.get("data", {}))
@@ -515,9 +530,9 @@ def transferir_admin():
         return
     print(f"\n{t('transferring', chat.get('title'), uid)}")
     status, data = req("/transferir-admin", {"thread_id": tid, "uid": uid})
-    if status == 200 and data.get("success"):
+    if status == 200 and data and data.get("success"):
         print(t("transfer_ok", uid))
-    else:
+    elif status is not None:
         print(f"{t('error')}{data.get('error') if data else t('no_response')}")
     input(t("press_enter"))
 
@@ -531,7 +546,7 @@ def info_usuario():
         return
     print(f"\n{t('searching', social_id)}")
     status, data = req("/info-usuario", {"social_id": social_id})
-    if status == 200 and data.get("success"):
+    if status == 200 and data and data.get("success"):
         u = data.get("data", {}).get("data", data.get("data", {}))
         print(f"\n{t('nickname')}{u.get('nickname', 'N/A')}")
         print(f"{t('social_id')}{u.get('socialId', 'N/A')}")
@@ -542,7 +557,7 @@ def info_usuario():
         print(f"{t('online')}{t('online_yes') if u.get('onlineStatus') == 1 else t('online_no')}")
         print(f"{t('gender')}{u.get('gender', 'N/A')}")
         print(f"{t('region')}{u.get('contentRegionName', 'N/A')}")
-    else:
+    elif status is not None:
         print(f"{t('error')}{data.get('error') if data else t('no_response')}")
     input(t("press_enter"))
 
