@@ -42,6 +42,7 @@ STRINGS = {
         "enter_call_ok": "[+] Entrou na call com sucesso!",
         "open_call_title": "Abrir Call",
         "loading_admin_chats": "[*] Carregando chats (admin/co-admin)...",
+        "loading_admin_transfer": "[*] Carregando chats...",
         "opening_call": "[*] Abrindo call em: ",
         "open_call_ok": "[+] Call aberta com sucesso!",
         "close_call_title": "Fechar Call",
@@ -125,6 +126,7 @@ STRINGS = {
         "enter_call_ok": "[+] Joined the call successfully!",
         "open_call_title": "Open Call",
         "loading_admin_chats": "[*] Loading chats (admin/co-admin)...",
+        "loading_admin_transfer": "[*] Loading chats...",
         "opening_call": "[*] Opening call in: ",
         "open_call_ok": "[+] Call opened successfully!",
         "close_call_title": "Close Call",
@@ -513,10 +515,30 @@ def transferir_admin():
     cls()
     cabecalho()
     print(f"\n  {t('transfer_title')}\n")
-    print(t("loading_admin_chats"))
+    print("[*] Carregando chats (admin)..." if lang == "pt" else "[*] Loading chats (admin)..." if lang == "en" else "[*] Cargando chats (admin)...")
     chats = [c for c in obter_chats_admin() if c.get("cargo") == "administrador"]
-    chat = selecionar_chat(chats)
-    if not chat:
+    if not chats:
+        print(t("no_chats"))
+        input(t("press_enter"))
+        return
+    print(t("available_chats"))
+    for i, c in enumerate(chats):
+        titulo = c.get("title", t("no_title"))
+        tid = c.get("thread_id", "")
+        print(f"  [{i+1}] {titulo}  ({tid})")
+    print(t("cancel"))
+    try:
+        op = int(input(t("select_chat").format("chat")).strip())
+        if op == 0:
+            return
+        if not (1 <= op <= len(chats)):
+            print(t("invalid_option"))
+            input(t("press_enter"))
+            return
+        chat = chats[op - 1]
+    except ValueError:
+        print(t("type_number"))
+        input(t("press_enter"))
         return
     tid = chat.get("thread_id")
     social_id = input(t("social_id_input")).strip().lstrip('@')
