@@ -514,7 +514,7 @@ def transferir_admin():
     cabecalho()
     print(f"\n  {t('transfer_title')}\n")
     print(t("loading_admin_chats"))
-    chats = obter_chats_admin()
+    chats = [c for c in obter_chats_admin() if c.get("cargo") == "administrador"]
     chat = selecionar_chat(chats)
     if not chat:
         return
