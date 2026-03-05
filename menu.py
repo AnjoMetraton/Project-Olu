@@ -59,6 +59,7 @@ STRINGS = {
         "inviting": "[*] Convidando {} seguidor(es) para {}...",
         "invite_ok": "[+] {} seguidor(es) convidado(s) com sucesso!",
         "transfer_title": "Transferir Administracao",
+        "uid_input": "UID do usuario: ",
         "invalid_uid": "[!] UID invalido.",
         "transferring": "[*] Transferindo administracao de {} para UID {}...",
         "transfer_ok": "[+] Convite de administrador enviado com sucesso para UID {}!",
@@ -66,17 +67,19 @@ STRINGS = {
         "social_id_input": "Social ID (@usuario): ",
         "invalid_social": "[!] Social ID invalido.",
         "searching": "[*] Buscando @{}...",
-        "nickname": "  Nickname:    ",
-        "social_id": "  Social ID:   @",
-        "uid": "  UID:         ",
-        "followers": "  Seguidores:  ",
-        "following": "  Seguindo:    ",
-        "status": "  Status:      ",
-        "online": "  Online:      ",
-        "online_yes": "Sim",
-        "online_no": "Nao",
-        "gender": "  Genero:      ",
-        "region": "  Regiao:      ",
+        "data_nascimento": "  Nascimento:       ",
+        "localizacao": "  Localizacao:      ",
+        "ultimo_acesso": "  Ultimo acesso:    ",
+        "foto": "  Foto:            ",
+        "cor_tema": "  Cor do tema:      ",
+        "preview": "  Preview:         ",
+        "social_id_mod": "  Social ID mod.:   ",
+        "regiao": "  Regiao:          ",
+        "convite_pub": "  Conv. publico:    ",
+        "convite_priv": "  Conv. privado:    ",
+        "convite_circ": "  Conv. circulo:    ",
+        "capa": "  Capa:            ",
+        "nao_disponivel": "Nao disponivel",
         "menu_1": "  [1]  Entrar na call sem permissao",
         "menu_2": "  [2]  Abrir call",
         "menu_3": "  [3]  Fechar call",
@@ -139,6 +142,7 @@ STRINGS = {
         "inviting": "[*] Inviting {} follower(s) to {}...",
         "invite_ok": "[+] {} follower(s) invited successfully!",
         "transfer_title": "Transfer Administration",
+        "uid_input": "User UID: ",
         "invalid_uid": "[!] Invalid UID.",
         "transferring": "[*] Transferring admin of {} to UID {}...",
         "transfer_ok": "[+] Admin invite sent successfully to UID {}!",
@@ -146,17 +150,19 @@ STRINGS = {
         "social_id_input": "Social ID (@user): ",
         "invalid_social": "[!] Invalid Social ID.",
         "searching": "[*] Searching @{}...",
-        "nickname": "  Nickname:    ",
-        "social_id": "  Social ID:   @",
-        "uid": "  UID:         ",
-        "followers": "  Followers:   ",
-        "following": "  Following:   ",
-        "status": "  Status:      ",
-        "online": "  Online:      ",
-        "online_yes": "Yes",
-        "online_no": "No",
-        "gender": "  Gender:      ",
-        "region": "  Region:      ",
+        "data_nascimento": "  Birthday:         ",
+        "localizacao": "  Location:         ",
+        "ultimo_acesso": "  Last active:      ",
+        "foto": "  Photo:           ",
+        "cor_tema": "  Theme color:      ",
+        "preview": "  Preview:         ",
+        "social_id_mod": "  Social ID mod.:   ",
+        "regiao": "  Region:          ",
+        "convite_pub": "  Public invite:    ",
+        "convite_priv": "  Private invite:   ",
+        "convite_circ": "  Circle invite:    ",
+        "capa": "  Cover:           ",
+        "nao_disponivel": "Not available",
         "menu_1": "  [1]  Join call without permission",
         "menu_2": "  [2]  Open call",
         "menu_3": "  [3]  Close call",
@@ -219,6 +225,7 @@ STRINGS = {
         "inviting": "[*] Invitando {} seguidor(es) a {}...",
         "invite_ok": "[+] {} seguidor(es) invitado(s) con exito!",
         "transfer_title": "Transferir Administracion",
+        "uid_input": "UID del usuario: ",
         "invalid_uid": "[!] UID invalido.",
         "transferring": "[*] Transfiriendo administracion de {} al UID {}...",
         "transfer_ok": "[+] Invitacion de administrador enviada con exito al UID {}!",
@@ -226,17 +233,19 @@ STRINGS = {
         "social_id_input": "Social ID (@usuario): ",
         "invalid_social": "[!] Social ID invalido.",
         "searching": "[*] Buscando @{}...",
-        "nickname": "  Nickname:    ",
-        "social_id": "  Social ID:   @",
-        "uid": "  UID:         ",
-        "followers": "  Seguidores:  ",
-        "following": "  Siguiendo:   ",
-        "status": "  Estado:      ",
-        "online": "  En linea:    ",
-        "online_yes": "Si",
-        "online_no": "No",
-        "gender": "  Genero:      ",
-        "region": "  Region:      ",
+        "data_nascimento": "  Nacimiento:       ",
+        "localizacao": "  Ubicacion:        ",
+        "ultimo_acesso": "  Ultimo acceso:    ",
+        "foto": "  Foto:            ",
+        "cor_tema": "  Color tema:       ",
+        "preview": "  Preview:         ",
+        "social_id_mod": "  Social ID mod.:   ",
+        "regiao": "  Region:          ",
+        "convite_pub": "  Invit. publica:   ",
+        "convite_priv": "  Invit. privada:   ",
+        "convite_circ": "  Invit. circulo:   ",
+        "capa": "  Portada:         ",
+        "nao_disponivel": "No disponible",
         "menu_1": "  [1]  Unirse a llamada sin permiso",
         "menu_2": "  [2]  Abrir llamada",
         "menu_3": "  [3]  Cerrar llamada",
@@ -522,9 +531,8 @@ def transferir_admin():
             print(f"{t('error')}{data.get('error') if data else t('no_response')}")
         input(t("press_enter"))
         return
-    u = data.get("data", {}).get("data", data.get("data", {}))
-    uid = str(u.get("uid", "")).strip()
-    if not uid:
+    uid = str(data.get("data", {}).get("uid") or "").strip()
+    if not uid or uid == "None":
         print(t("invalid_uid"))
         input(t("press_enter"))
         return
@@ -535,6 +543,14 @@ def transferir_admin():
     elif status is not None:
         print(f"{t('error')}{data.get('error') if data else t('no_response')}")
     input(t("press_enter"))
+
+def _url_recurso(media):
+    if not media:
+        return None
+    recursos = media.get("resourceList", [])
+    if recursos:
+        return recursos[0].get("url")
+    return media.get("baseUrl")
 
 def info_usuario():
     cls()
@@ -547,16 +563,21 @@ def info_usuario():
     print(f"\n{t('searching', social_id)}")
     status, data = req("/info-usuario", {"social_id": social_id})
     if status == 200 and data and data.get("success"):
-        u = data.get("data", {}).get("data", data.get("data", {}))
-        print(f"\n{t('nickname')}{u.get('nickname', 'N/A')}")
-        print(f"{t('social_id')}{u.get('socialId', 'N/A')}")
-        print(f"{t('uid')}{u.get('uid', 'N/A')}")
-        print(f"{t('followers')}{u.get('fansCount', 'N/A')}")
-        print(f"{t('following')}{u.get('followingCount', 'N/A')}")
-        print(f"{t('status')}{u.get('status', 'N/A')}")
-        print(f"{t('online')}{t('online_yes') if u.get('onlineStatus') == 1 else t('online_no')}")
-        print(f"{t('gender')}{u.get('gender', 'N/A')}")
-        print(f"{t('region')}{u.get('contentRegionName', 'N/A')}")
+        u = data.get("data", {})
+        nd = t("nao_disponivel")
+        print(f"\n{t('data_nascimento')}{u.get('data_nascimento') or nd}")
+        print(f"{t('ultimo_acesso')}{u.get('ultimo_acesso') or nd}")
+        loc = u.get("localizacao")
+        print(f"{t('localizacao')}{loc if loc else nd}")
+        print(f"{t('cor_tema')}{u.get('cor_tema') or nd}")
+        print(f"{t('regiao')}{u.get('regiao_conteudo') or nd}")
+        print(f"{t('social_id_mod')}{u.get('social_id_modificado') if u.get('social_id_modificado') is not None else nd}")
+        print(f"{t('convite_pub')}{u.get('status_convite_chat_publico') or nd}")
+        print(f"{t('convite_priv')}{u.get('status_convite_chat_privado') or nd}")
+        print(f"{t('convite_circ')}{u.get('status_convite_circulo') or nd}")
+        print(f"{t('foto')}{_url_recurso(u.get('foto')) or nd}")
+        print(f"{t('capa')}{_url_recurso(u.get('capa')) or nd}")
+        print(f"{t('preview')}{_url_recurso(u.get('preview')) or nd}")
     elif status is not None:
         print(f"{t('error')}{data.get('error') if data else t('no_response')}")
     input(t("press_enter"))
